@@ -1,6 +1,7 @@
 import os
 from sysreq import systemVerify
 from fastinstall import fastInstall
+from custominstall import customInstall
 
 # Verify the System Requirements
 def verify_system_requirements():
@@ -32,7 +33,7 @@ def main_menu():
             fastInstall()
         elif choice == '2':
             print("You selected Custom Installation.")
-            # Add the custom installation logic here
+            customInstall()
         elif choice == '3':
             print("Exiting...")
             break
