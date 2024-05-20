@@ -17,7 +17,7 @@ def show_menu():
  \  /\  / (_| |/ / / / | (_| | | |  __/ |   
   \/  \/ \__,_/___|\/   \__,_|_|_|\___|_|   
                                            
-    WazTaller
+    By: https://github.com/LorranRocha
 
     1) Fast Installation
     2) Custom Installation
