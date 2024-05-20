@@ -59,6 +59,3 @@ def customInstall():
 
     #   Install Wazuh Server
     serverInstall()
-
-# Testando a função customInstall
-customInstall()
