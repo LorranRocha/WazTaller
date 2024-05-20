@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Função para verificar se Python 3 está instalado
+# Function to check if Python 3 is installed
 check_python3() {
     if command -v python3 &> /dev/null; then
         return 0
@@ -9,7 +9,7 @@ check_python3() {
     fi
 }
 
-# Função para verificar se pip3 está instalado
+# Function to check if pip3 is installed
 check_pip3() {
     if command -v pip3 &> /dev/null; then
         return 0
@@ -18,46 +18,65 @@ check_pip3() {
     fi
 }
 
-# Função para instalar Python 3 e pip3
+# Function to wait for the package manager to be unlocked
+wait_for_unlock() {
+    while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+        echo "Waiting for the package manager to be unlocked..."
+        sleep 1
+    done
+}
+
+# Function to install Python 3 and pip3
 install_python3() {
-    echo "Python 3 não encontrado. Instalando Python 3..."
+    echo "Python 3 not found. Installing Python 3..."
+
+    # Wait for the package manager to be unlocked
+    wait_for_unlock
     
-    # Detecta o sistema operacional para instalar o Python 3 corretamente
+    # Detect the operating system to correctly install Python 3
     if [ -f /etc/debian_version ]; then
-        # Sistema baseado em Debian (Ubuntu, etc.)
+        # Debian-based system (Ubuntu, etc.)
         sudo apt update
         sudo apt install -y python3 python3-pip
     elif [ -f /etc/redhat-release ]; then
-        # Sistema baseado em Red Hat (Fedora, CentOS, etc.)
+        # Red Hat-based system (Fedora, CentOS, etc.)
         sudo yum install -y python3 python3-pip
     elif [ "$(uname)" == "Darwin" ]; then
         # macOS
-        # Assumindo que o Homebrew está instalado
+        # Assuming Homebrew is installed
         brew install python
     else
-        echo "Sistema operacional não suportado para instalação automática. Por favor, instale o Python 3 manualmente."
+        echo "Operating system not supported for automatic installation. Please install Python 3 manually."
         exit 1
     fi
 }
 
-# Verifica se Python 3 está instalado
-if check_python3; then
-    echo "ok"
-else
-    install_python3
-    # Verifica novamente após a instalação
-    if ! check_python3; then
-        echo "Falha na instalação do Python 3."
-        exit 1
+# Main script execution
+main() {
+    # Check if Python 3 is installed
+    if check_python3; then
+        echo "ok"
+    else
+        install_python3
+        # Check again after installation
+        if ! check_python3; then
+            echo "Failed to install Python 3."
+            exit 1
+        fi
     fi
-fi
 
-# Verifica se pip3 está instalado
-if ! check_pip3; then
-    echo "pip3 não encontrado. Tentando instalar pip3..."
-    sudo apt install -y python3-pip || sudo yum install -y python3-pip || (echo "Falha na instalação do pip3. Instale manualmente." && exit 1)
-fi
+    # Check if pip3 is installed
+    if ! check_pip3; then
+        echo "pip3 not found. Trying to install pip3..."
+        sudo apt install -y python3-pip || sudo yum install -y python3-pip || (echo "Failed to install pip3. Please install manually." && exit 1)
+    fi
 
-# Instala os pacotes necessários e executa o script
-pip3 install pyyaml psutil
-sudo python3 menu.py
+    # Install the required packages
+    pip3 install pyyaml psutil
+
+    # Run the menu script
+    sudo python3 menu.py
+}
+
+# Execute the main function
+main
